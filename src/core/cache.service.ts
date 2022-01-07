@@ -1,6 +1,6 @@
-import { map, of } from 'rxjs';
+import { finalize, map, of, share } from 'rxjs';
 
-interface Options {
+export interface Options {
   maxAge?: number;
   clearOn?: string[];
   cachecForEver?: boolean;
@@ -12,7 +12,7 @@ class CacheService {
   private cachesToBust: { [id: string]: string[] } = {};
   constructor() {}
 
-  public Cacheble(cacheOptions: Options = {}): MethodDecorator {
+  public Cachable(cacheOptions: Options = {}): MethodDecorator {
     return (
       target: Object,
       propertyKey: string,
@@ -42,7 +42,7 @@ class CacheService {
 
   public modifiedFunc(originalMethod: Function, id: string, optinons: Options) {
     const CacheService = this;
-    return function (...args: any[]) {
+    return (...args: any[]) => {
       console.log('this', this);
       const argsSignature = JSON.stringify(args);
       const cachedModels = CacheService.cachedModels[id][argsSignature];
@@ -63,7 +63,7 @@ class CacheService {
     };
   }
 
-  public makeApiCall(
+  private makeApiCall(
     originMethod: Function,
     args: any[],
     bind: any,
@@ -79,7 +79,9 @@ class CacheService {
           this.cachedModels[id][argsSignature] = res;
 
           return res;
-        })
+        }),finalize(() => {
+          this.pendingRequest[id][argsSignature] = null
+        }), share()
       ));
   }
 
@@ -92,4 +94,15 @@ class CacheService {
     this.pendingRequest[id] = {};
     this.lastCalledTime[id] = {};
   }
+
+  public clearCachesForEvent(event: string) {
+    this.cachesToBust[event].forEach((cachedId) => {
+        this.resetCache(cachedId)
+    })
+    this.cachesToBust[event] = []
+  }
 }
+
+const cacheService = new CacheService()
+export const Cachable = cacheService.Cachable.bind(cacheService) as (cacheOptions: Options) => MethodDecorator
+export const clearCachesForEvent= cacheService.clearCachesForEvent.bind(cacheService) as (event: string) => void
