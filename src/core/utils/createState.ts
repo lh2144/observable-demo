@@ -6,7 +6,8 @@ export const createState = <T>(initState: T): StateResult<T> => {
   return {
     state$: stateSubject.asObservable(),
     setState(val: any) {
-      stateSubject.next(val)
+      const preState = stateSubject.getValue()
+      stateSubject.next({...preState, ...val})
     },
     getState() {
       return stateSubject.getValue()

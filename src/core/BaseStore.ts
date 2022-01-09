@@ -7,25 +7,23 @@ export interface StateResult<T> {
   setState(val: any): void
 }
 interface Config {
-
+  stateHistory: boolean
+  logState: boolean
 }
+
 export class BaseStore<s> {
 
   private state: StateResult<s>
   constructor(defaultState: s, setting?: Config) {
     this.state = createState(defaultState)
+    this.stateChange = this.state.state$
   }
 
   public setState(val: Partial<s>) {
     this.state.setState(val)
   }
 
-  public stateChange(pipeFunc: (input$: Observable<any>) => Observable<any>): Observable<s> {
-    if (pipeFunc) {
-      return pipeFunc(this.state.state$)
-    }
-    return this.state.state$
-  }
+  public stateChange: Observable<s>
 
   public getState(selector?: (state: s) => any): s | Partial<s> | any {
     const state = this.state.getState()
@@ -34,5 +32,12 @@ export class BaseStore<s> {
     }
     return state
   }
+
+  public getAllState(): s {
+    return this.state.getState()
+  }
+  // public getState$() {
+  //   return this.state.state$
+  // }
 
 }
