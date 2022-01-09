@@ -12,7 +12,8 @@ interface Config {
 export class BaseStore<s> {
 
   private state: StateResult<s>
-  constructor(defaultState: s, setting?: Config) {
+
+  constructor(defaultState: s, setting: Config) {
     this.state = createState(defaultState)
   }
 

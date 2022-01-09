@@ -1,12 +1,19 @@
-import React from 'react'
-import logo from './logo.svg';
+import React, { useEffect } from 'react';
 import './App.css';
 
 function App() {
+  useEffect(() => {
+    fetch('https://jsonplaceholder.typicode.com/posts', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      mode: 'cors',
+    }).then((res) => {
+      return res.json()
+    }).then((r) => console.log('posts', r));
+  }, []);
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>

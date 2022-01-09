@@ -79,9 +79,11 @@ class CacheService {
           this.cachedModels[id][argsSignature] = res;
 
           return res;
-        }),finalize(() => {
-          this.pendingRequest[id][argsSignature] = null
-        }), share()
+        }),
+        finalize(() => {
+          this.pendingRequest[id][argsSignature] = null;
+        }),
+        share()
       ));
   }
 
@@ -97,12 +99,18 @@ class CacheService {
 
   public clearCachesForEvent(event: string) {
     this.cachesToBust[event].forEach((cachedId) => {
-        this.resetCache(cachedId)
-    })
-    this.cachesToBust[event] = []
+      this.resetCache(cachedId);
+    });
+    this.cachesToBust[event] = [];
   }
 }
 
-const cacheService = new CacheService()
-export const Cachable = cacheService.Cachable.bind(cacheService) as (cacheOptions: Options) => MethodDecorator
-export const clearCachesForEvent= cacheService.clearCachesForEvent.bind(cacheService) as (event: string) => void
+
+
+const cacheService = new CacheService();
+export const Cachable = cacheService.Cachable.bind(cacheService) as (
+  cacheOptions: Options
+) => MethodDecorator;
+export const clearCachesForEvent = cacheService.clearCachesForEvent.bind(
+  cacheService
+) as (event: string) => void;
