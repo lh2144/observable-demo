@@ -7,7 +7,7 @@ export interface StateResult<T> {
   setState(val: any): void;
 }
 
-type StateFunc<T> = (state: T) => Partial<T>;
+export type StateFunc<T> = (state: T) => Partial<T>;
 interface Config {
   stateHistory?: boolean;
   logState?: boolean;
@@ -52,7 +52,7 @@ export class BaseStore<s> {
     }
   }
 
-  protected getState(selector?: (state: s) => any): s | Partial<s> | any {
+  protected getState(selector?: (state: s) => Partial<s>): s | Partial<s> | any {
     const state = this.state.getState();
     if (selector) {
       return selector(state);

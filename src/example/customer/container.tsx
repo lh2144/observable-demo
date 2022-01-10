@@ -13,25 +13,32 @@ import CustomerList from "./customerList";
 
 interface props {}
 const Index = (props: props): JSX.Element => {
-    const [state] = useStore<CustomerState>(CustomerStore);
-    const [input, setInput] = useState("");
+    const [state] = useStore<CustomerState, any>(CustomerStore);
+    const [list, setList] = useState<any>(state.customers)
     const subscription = useRef<Subscription>();
     const subject = useRef<Subject<string>>(new Subject());
     useEffect(() => {
-        CustomerStore.getCustomers();
+        CustomerStore.setCustomers();
     }, []);
-
+    useEffect(() => {
+        setList(state.customers)
+    }, [state])
     useEffect(() => {
         subscription.current = subject.current
-            ?.pipe(debounceTime(500), distinctUntilChanged())
+            ?.pipe(debounceTime(1000), distinctUntilChanged(), switchMap((input) => {
+                return CustomerStore.fetchCustomerByName(input)
+            }))
             .subscribe((target) => {
                 console.log("target", target);
-                setInput(target)
+                if (target.length === 0) {
+                    setList(CustomerStore.getCustomers().customers)
+                    return
+                }
+                setList(target)
 
             });
         return () => subscription.current?.unsubscribe();
     }, []);
-    console.log("state", state);
 
     const handleChange = useCallback((e: any) => {
         subject.current.next(e.target?.value);
@@ -54,10 +61,8 @@ const Index = (props: props): JSX.Element => {
                 type={"text"}
                 onKeyUp={handleChange}
             />
-            <div style={style}>
-                your input: {input}
-            </div>
-            <CustomerList customers={state.customers} />
+
+            <CustomerList customers={list} />
         </>
     );
 };

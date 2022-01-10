@@ -1,18 +1,13 @@
 import React, { useEffect } from 'react';
 import CustomerContainer from './example/customer/container';
+import PostsService from './example/services/posts.service'
+
 import './App.css';
 
 function App() {
   useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/posts', {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      mode: 'cors',
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((r) => console.log('posts', r));
+    PostsService.setPosts()
+    console.log('posts', PostsService.getPosts())
   }, []);
   return <CustomerContainer />;
 }
