@@ -17,6 +17,7 @@ const Index = (props: props): JSX.Element => {
     const [list, setList] = useState<any>(state.customers)
     const subscription = useRef<Subscription>();
     const subject = useRef<Subject<string>>(new Subject());
+
     useEffect(() => {
         CustomerStore.setCustomers();
     }, []);
@@ -26,14 +27,13 @@ const Index = (props: props): JSX.Element => {
     useEffect(() => {
         subscription.current = subject.current
             ?.pipe(debounceTime(1000), distinctUntilChanged(), switchMap((input) => {
+                if (input?.length === 0) {
+                    return of(CustomerStore.storeStates.customers)
+                }
                 return CustomerStore.fetchCustomerByName(input)
             }))
             .subscribe((target) => {
                 console.log("target", target);
-                if (target.length === 0) {
-                    setList(CustomerStore.getCustomers().customers)
-                    return
-                }
                 setList(target)
 
             });
@@ -59,7 +59,7 @@ const Index = (props: props): JSX.Element => {
                 style={style}
                 name="test"
                 type={"text"}
-                onKeyUp={handleChange}
+                onChange={handleChange}
             />
 
             <CustomerList customers={list} />

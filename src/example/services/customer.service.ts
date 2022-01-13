@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-useless-constructor */
 import { from } from 'rxjs';
 import { BaseStore } from 'src/core/BaseStore';
+import { Cachable } from 'src/core/cache.service';
 
 export interface CustomerState {
   customers: { username: string; phone: number }[];
@@ -12,6 +13,7 @@ class Customer extends BaseStore<CustomerState> {
     super(initialState);
   }
 
+  @Cachable({cachecForEver: true, clearOn: ['update']})
   public fetchCustomer() {
     return from(
       fetch('https://jsonplaceholder.typicode.com/users', {
@@ -38,7 +40,7 @@ class Customer extends BaseStore<CustomerState> {
     this.fetchCustomer().subscribe((res) => this.setState({customers: res}));
   }
 
-  public getCustomers() {
+  get storeStates() {
     return this.getAllState()
   }
 

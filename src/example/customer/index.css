@@ -4,4 +4,5 @@ margin: auto;
 display: flex;
 justify-content: space-between;
 border-bottom: 1px solid blue;
+margin-bottom: 2px;
 }

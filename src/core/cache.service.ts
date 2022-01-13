@@ -41,13 +41,11 @@ class CacheService {
   }
 
   public modifiedFunc(originalMethod: Function, id: string, optinons: Options) {
-    const CacheService = this;
     return (...args: any[]) => {
-      console.log('this', this);
       const argsSignature = JSON.stringify(args);
-      const cachedModels = CacheService.cachedModels[id][argsSignature];
-      const pendingRequest = CacheService.pendingRequest[id][argsSignature];
-      const lastCalledTime = CacheService.lastCalledTime[id][argsSignature];
+      const cachedModels = this.cachedModels[id][argsSignature];
+      const pendingRequest = this.pendingRequest[id][argsSignature];
+      const lastCalledTime = this.lastCalledTime[id][argsSignature];
       if (
         optinons.cachecForEver ||
         (lastCalledTime && Date.now() - lastCalledTime < optinons.maxAge!)
@@ -56,9 +54,11 @@ class CacheService {
           return pendingRequest;
         } else if (cachedModels) {
           return of(cachedModels);
+        } else {
+          return this.makeApiCall(originalMethod, args, this, id, optinons)
         }
       } else {
-        this.makeApiCall(originalMethod, args, this, id, optinons);
+        return this.makeApiCall(originalMethod, args, this, id, optinons);
       }
     };
   }

@@ -13,7 +13,6 @@ export const useStore = <S, TSelected = unknown>(storeClass: InstanceType<typeof
             return;
         }
         const newState = {...state, ...s} as any
-        console.log('selector', selector? selector(newState) : '11' )
         setState(selector ? selector(newState) : newState)
     };
     useEffect(() => {

@@ -38,7 +38,7 @@ export class BaseStore<s> {
 
     if (this.setting.logState) {
       const caller = this.constructor
-        ? '\r\nCaller: ' + this.constructor.name
+        ? '\r\nFrom: ' + this.constructor.name
         : '';
       console.log(
         '%cSTATE CHANGED',
